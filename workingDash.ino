@@ -335,7 +335,6 @@ void displayTPS() {
 void displayBatt() {
   //asdf
 }
-
 void initSequence() {
   // fancy startup sequence
   // display logo on OLED
