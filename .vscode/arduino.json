@@ -1,7 +1,7 @@
 {
     "programmer": "ArduinoISP",
     "board": "arduino:avr:nano",
-    "sketch": "dash\\q19.ino",
+    "sketch": "q20.ino",
     "configuration": "cpu=atmega328",
     "port": "COM8"
 }
