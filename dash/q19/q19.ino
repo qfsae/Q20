@@ -135,7 +135,7 @@ PE6: Bat Volt, Temps
 #define PDMs 0X0500
 #define PDM1 0x7FF    // FAN | GLOBAL ERROR | BAT VOLT
 unsigned char len = 0;
-unsigned char buf[64];
+unsigned char buf[64]; // This was 8 in other dash code but doesnt matter
 unsigned int canID;
 
 // CAN Value Variables 
@@ -244,27 +244,33 @@ int switchMode = 0;
 int pitCom = 0;
 bool startUp = false;
 
+// Top level initialization
 void setup() {
   Serial.begin(115200);
   Serial.println("--------- Upper Dash V2 ---------");
-  initShiftRegisters(); // Initialize Shift Registers 
+  initShiftRegisters(); // Initialize Shift Registers
+  initDisplay(); // Initializes display and puts logo on screen
+  initSequence1(); // Light show
   initCAN(); // Initialize CAN
-  dispLogo();
-  initSequence1();
   initSequence2();
-  waitForStartup();
-  startUpSequence();
+  delay(100);
+//  if(waitForStartup()){
+//    startUpSequence();
+//  }
 }
 
+// Main sequence
 void loop() {
   resetSR(); // Reset shift register values
   updateData(); // read data from CAN and adjust variables
   shiftLights(); // update SR1, SR2
   statusLights(); // update SR4, SR5, SR6
-  dashCycle();
+  //dashCycle();
+  dispTPS();
   updateDash(); // Update the lights on the dash
 }
 
+// Initialize Shift Registers
 void initShiftRegisters(){
   pinMode(latchPIN, OUTPUT);
   pinMode(clockPIN, OUTPUT);
@@ -280,16 +286,34 @@ void initShiftRegisters(){
   digitalWrite(latchPIN, HIGH);
 }
 
+void initDisplay(){
+  display.begin(SSD1306_SWITCHCAPVCC);
+  display.setTextColor(WHITE);
+  display.clearDisplay();
+  display.display();
+  dispLogo();
+}
+
+// Initialize CANBus connection
 void initCAN() {
+  display.clearDisplay();
+  display.setTextSize(2);
+  display.setCursor(0,0);
+  display.println("CAN Init");
+  display.display();
   // We could do something sick here for while its connecting to CAN
   while (CAN_OK != CAN.begin(CAN_250KBPS))              // init can bus : baudrate = 250k
   {
     Serial.println("Connecting to CAN");
   }
-  Serial.println("CAN BUS Shield init ok!");
+  display.setCursor(0,0);
+  display.println("SUCESS!");
+  display.display();
+  //Serial.println("CAN BUS Shield init ok!");
   // Print something to the dash to say initializing complete
 }
 
+/* more cool stuff */
 void initSequence1() {
   // light each shift light one at a time up and down
   for (int i = 1; i <= 24; i++) {
@@ -336,10 +360,10 @@ void initSequence1() {
     digitalWrite(latchPIN, HIGH);
 
     delay(25);
-    Serial.println("Done startup Sequence");
   }
 }
 
+// After CAN init
 void initSequence2(){
   for(int j = 0; j < 3; j++){
     for (int i = 1; i <= 15; i++) {
@@ -375,12 +399,29 @@ void initSequence2(){
       shiftOut(dataPIN, clockPIN, MSBFIRST, SR2);
       shiftOut(dataPIN, clockPIN, MSBFIRST, SR1);
       digitalWrite(latchPIN, HIGH);
-      delay(40);
+      delay(150);
     }
   }
 }
 
-void initSequence3() {
+/* waiting for car to start
+Dash has full functionality except shift lights */
+bool waitForStartup(){
+  const int startTime = millis();
+  while(!startUp){
+    resetSR(); // Reset shift register values
+    updateData(); // read data from CAN and adjust variables
+    statusLights(); // update SR4, SR5, SR6
+    dashCycle();
+    updateDash(); // Update the lights on the dash
+    if(rpm > 1000 && (millis() - startTime) > 1000){ // Car has been started for one sec
+      return true; // Will exit this loop when car starts
+    }
+  }
+}
+
+// Cool dash sequence when car is started
+void startUpSequence() {
   // light each shift light one at a time up and down
   for (int i = 1; i <= 24; i++) {
     switch (i) {
@@ -396,18 +437,18 @@ void initSequence3() {
       case 10: SR1 += sLED10; break;
       case 11: SR1 += sLED11; break;
       case 12: SR1 += sLED12; break;
-      case 13: SR1 -= sLED12; delay(20); break;
-      case 14: SR1 -= sLED11; delay(20); break;
-      case 15: SR1 -= sLED10; delay(20); break;
-      case 16: SR1 -= sLED9; delay(20); break;
-      case 17: SR1 -= sLED8; delay(20); break;
-      case 18: SR1 -= sLED7; delay(20); break;
-      case 19: SR2 -= sLED6; delay(20); break;
-      case 20: SR2 -= sLED5; delay(20); break;
-      case 21: SR2 -= sLED4; delay(20); break;
-      case 22: SR2 -= sLED3; delay(20); break;
-      case 23: SR2 -= sLED2; delay(20); break;
-      case 24: SR2 -= sLED1; delay(20); break;
+      case 13: SR1 -= sLED12; delay(100); break;
+      case 14: SR1 -= sLED11; delay(100); break;
+      case 15: SR1 -= sLED10; delay(100); break;
+      case 16: SR1 -= sLED9; delay(100); break;
+      case 17: SR1 -= sLED8; delay(100); break;
+      case 18: SR1 -= sLED7; delay(100); break;
+      case 19: SR2 -= sLED6; delay(100); break;
+      case 20: SR2 -= sLED5; delay(100); break;
+      case 21: SR2 -= sLED4; delay(100); break;
+      case 22: SR2 -= sLED3; delay(100); break;
+      case 23: SR2 -= sLED2; delay(100); break;
+      case 24: SR2 -= sLED1; delay(100); break;
     }
     //randomize colors on the Status LEDS
     int colours[] = {111, 183, 219}; // red green blue
@@ -435,29 +476,11 @@ void initSequence3() {
     shiftOut(dataPIN, clockPIN, MSBFIRST, SR2);
     shiftOut(dataPIN, clockPIN, MSBFIRST, SR1);
     digitalWrite(latchPIN, HIGH);
-
-    delay(25);
-    Serial.println("Done startup Sequence");
+    delay(50);
   }
 }
 
-void waitForStartup(){
-  while(!startUp){
-    resetSR(); // Reset shift register values
-    updateData(); // read data from CAN and adjust variables
-    statusLights(); // update SR4, SR5, SR6
-    dashCycle();
-    updateDash(); // Update the lights on the dash
-    if(rpm > 1000){
-      startUp = true; // Will exit this loop when car starts
-    }
-  }
-}
-
-void startUpSequence(){
-  // If we get this to work, we can do something cool here
-}
-
+// Reset shift register values
 void resetSR(){
   SR1 = 0;
   SR2 = 0;
@@ -467,10 +490,12 @@ void resetSR(){
   SR6 = 255;
 }
 
+// Update data from CAN
 void updateData() {
   if (CAN_MSGAVAIL == CAN.checkReceive()) {          // check if data coming
     CAN.readMsgBuf(&len, buf);    // read data,  len: data length, buf: data buf
     canID = CAN.getCanId();
+    /* For debugging */
     if (canID == PE1) { // PE1 
       // RPM 
       rpm = buf[1] * 256 + buf[0];
@@ -529,17 +554,7 @@ void updateData() {
   }
 }
 
-void updateDash(){
-  digitalWrite(latchPIN, LOW);
-  shiftOut(dataPIN, clockPIN, MSBFIRST, SR6);
-  shiftOut(dataPIN, clockPIN, MSBFIRST, SR5);
-  shiftOut(dataPIN, clockPIN, MSBFIRST, SR4);
-  shiftOut(dataPIN, clockPIN, MSBFIRST, SR3);
-  shiftOut(dataPIN, clockPIN, MSBFIRST, SR2);
-  shiftOut(dataPIN, clockPIN, MSBFIRST, SR1);
-  digitalWrite(latchPIN, HIGH);
-}
-
+// Update shift lights
 void shiftLights() {
   // Should we add blinking when 12 lights are on??
   if (rpm > sRPM12) {
@@ -598,6 +613,7 @@ void shiftLights() {
   }
 }
 
+// Update status lights
 void statusLights() {
   // TMP    FAN
   // BAT    PDM
@@ -671,6 +687,18 @@ void statusLights() {
   if (launchArm) {
     SR4 -= ledRG + ledRR;
   }
+}
+
+// Push changes to dash
+void updateDash(){
+  digitalWrite(latchPIN, LOW);
+  shiftOut(dataPIN, clockPIN, MSBFIRST, SR6);
+  shiftOut(dataPIN, clockPIN, MSBFIRST, SR5);
+  shiftOut(dataPIN, clockPIN, MSBFIRST, SR4);
+  shiftOut(dataPIN, clockPIN, MSBFIRST, SR3);
+  shiftOut(dataPIN, clockPIN, MSBFIRST, SR2);
+  shiftOut(dataPIN, clockPIN, MSBFIRST, SR1);
+  digitalWrite(latchPIN, HIGH);
 }
 
 // Cycle dash modes
