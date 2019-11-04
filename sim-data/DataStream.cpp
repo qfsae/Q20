@@ -60,8 +60,46 @@ void initStatic() {
 	}
 }
 
+HANDLE hSerial;
+bool status;
+
+int initSerial() {
+	TCHAR comPort[] = TEXT("\\\\.\\COM7");
+	hSerial = CreateFile(comPort,
+	GENERIC_READ | GENERIC_WRITE,
+	0,
+	NULL,
+	OPEN_EXISTING,
+	0,
+	NULL);	
+
+	if(hSerial == INVALID_HANDLE_VALUE) {
+		printf("# Error in opening serial port");
+
+		return 1;
+	} else {
+		wcout << "$ Opening serial port successfull" << endl;
+		DCB dcbSerialParams = { 0 };
+		dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
+		status = GetCommState(hSerial, &dcbSerialParams);
+		dcbSerialParams.BaudRate = CBR_115200;
+		dcbSerialParams.ByteSize = 8;
+		dcbSerialParams.StopBits = ONESTOPBIT;
+		dcbSerialParams.Parity = NOPARITY;
+		SetCommState(hSerial, &dcbSerialParams);
+
+		return 0;
+	}
+
+}
+
+void closeHandle(HANDLE handle) {
+	CloseHandle(handle);
+}
+
 void dismiss(SMElement element) {
-    UnmapViewOfFile(element.mapFileBuffer);
+    UnmapViewOfFile;
+	(element.mapFileBuffer);
     CloseHandle(element.hMapFile);
 }
 
@@ -89,11 +127,28 @@ int _tmain(int argc, _TCHAR* argv[])
 	initPhysics();
 	initGraphics();
 	initStatic();
+	initSerial();
+
+	//get static data for this instance
+	SPageFileStatic* spf = (SPageFileStatic*)m_static.mapFileBuffer;
+	wcout << "$ Getting Assetto Data for :" << endl;
+	wcout << "$ CAR MODEL: " << spf->carModel << endl;
+	wcout << "$ TRACK    : " << spf->track << endl;
 
 	while (true)
 	{
+		char lpBuffer[] = "test";
+		DWORD dNoOFBytestoWrite;
+		DWORD dNoOfBytesWritten = 0;
+		dNoOFBytestoWrite = sizeof(lpBuffer);
 
-        SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
+		bool status = WriteFile(hSerial,
+			lpBuffer,
+			dNoOFBytestoWrite,
+			&dNoOfBytesWritten,
+			NULL);
+
+		SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
         printData("rpms", pf->rpms);
 		//printData("speed kmh", pf->speedKmh);
         Sleep(50);
@@ -181,6 +236,8 @@ int _tmain(int argc, _TCHAR* argv[])
 
 		// }
 	}
+
+	closeHandle(hSerial);
 
 	dismiss(m_graphics);
 	dismiss(m_physics);
