@@ -14,3 +14,4 @@
 *.wsf
 
 # End of https://www.gitignore.io/api/executable
+sim-data/.vscode/settings.json

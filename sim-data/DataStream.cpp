@@ -137,21 +137,29 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	while (true)
 	{
-		char lpBuffer[] = "test";
+		SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
+        //printData("rpms", pf->rpms);
+
+		int rpm = pf->rpms;
+		int gear = pf->gear;
+		float gas = pf->gas;
+
+		char lpBuffer[50];
+		sprintf(lpBuffer, "<%d,%d,%f>", rpm, gear, gas);
+		// sprintf(lpBuffer, "%d,%d,%f\n", rpm, gear, gas);
 		DWORD dNoOFBytestoWrite;
 		DWORD dNoOfBytesWritten = 0;
 		dNoOFBytestoWrite = sizeof(lpBuffer);
 
-		bool status = WriteFile(hSerial,
+		bool status = WriteFile(hSerial, 
 			lpBuffer,
 			dNoOFBytestoWrite,
 			&dNoOfBytesWritten,
 			NULL);
 
-		SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
-        printData("rpms", pf->rpms);
-		//printData("speed kmh", pf->speedKmh);
-        Sleep(50);
+		//wcout << lpBuffer << endl;
+		// printData("speed kmh", pf->speedKmh);
+        Sleep(5);
 		// if (GetAsyncKeyState(0x31) != 0) // user pressed 1
 		// {
 		// 	wcout << "---------------PHYSICS INFO---------------" << endl;
