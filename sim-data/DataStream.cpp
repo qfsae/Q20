@@ -60,8 +60,46 @@ void initStatic() {
 	}
 }
 
+HANDLE hSerial;
+bool status;
+
+int initSerial() {
+	TCHAR comPort[] = TEXT("\\\\.\\COM7");
+	hSerial = CreateFile(comPort,
+	GENERIC_READ | GENERIC_WRITE,
+	0,
+	NULL,
+	OPEN_EXISTING,
+	0,
+	NULL);	
+
+	if(hSerial == INVALID_HANDLE_VALUE) {
+		printf("# Error in opening serial port");
+
+		return 1;
+	} else {
+		wcout << "$ Opening serial port successfull" << endl;
+		DCB dcbSerialParams = { 0 };
+		dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
+		status = GetCommState(hSerial, &dcbSerialParams);
+		dcbSerialParams.BaudRate = CBR_115200;
+		dcbSerialParams.ByteSize = 8;
+		dcbSerialParams.StopBits = ONESTOPBIT;
+		dcbSerialParams.Parity = NOPARITY;
+		SetCommState(hSerial, &dcbSerialParams);
+
+		return 0;
+	}
+
+}
+
+void closeHandle(HANDLE handle) {
+	CloseHandle(handle);
+}
+
 void dismiss(SMElement element) {
-    UnmapViewOfFile(element.mapFileBuffer);
+    UnmapViewOfFile;
+	(element.mapFileBuffer);
     CloseHandle(element.hMapFile);
 }
 
@@ -89,14 +127,39 @@ int _tmain(int argc, _TCHAR* argv[])
 	initPhysics();
 	initGraphics();
 	initStatic();
+	initSerial();
+
+	//get static data for this instance
+	SPageFileStatic* spf = (SPageFileStatic*)m_static.mapFileBuffer;
+	wcout << "$ Getting Assetto Data for :" << endl;
+	wcout << "$ CAR MODEL: " << spf->carModel << endl;
+	wcout << "$ TRACK    : " << spf->track << endl;
 
 	while (true)
 	{
+		SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
+        //printData("rpms", pf->rpms);
 
-        SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
-        printData("rpms", pf->rpms);
-		//printData("speed kmh", pf->speedKmh);
-        Sleep(50);
+		int rpm = pf->rpms;
+		int gear = pf->gear;
+		float gas = pf->gas;
+
+		char lpBuffer[50];
+		sprintf(lpBuffer, "<%d,%d,%f>", rpm, gear, gas);
+		// sprintf(lpBuffer, "%d,%d,%f\n", rpm, gear, gas);
+		DWORD dNoOFBytestoWrite;
+		DWORD dNoOfBytesWritten = 0;
+		dNoOFBytestoWrite = sizeof(lpBuffer);
+
+		bool status = WriteFile(hSerial, 
+			lpBuffer,
+			dNoOFBytestoWrite,
+			&dNoOfBytesWritten,
+			NULL);
+
+		//wcout << lpBuffer << endl;
+		// printData("speed kmh", pf->speedKmh);
+        Sleep(5);
 		// if (GetAsyncKeyState(0x31) != 0) // user pressed 1
 		// {
 		// 	wcout << "---------------PHYSICS INFO---------------" << endl;
@@ -181,6 +244,8 @@ int _tmain(int argc, _TCHAR* argv[])
 
 		// }
 	}
+
+	closeHandle(hSerial);
 
 	dismiss(m_graphics);
 	dismiss(m_physics);
