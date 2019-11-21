@@ -13,7 +13,7 @@ void setup() {
   pinMode(downShiftButton,INPUT);
   pinMode(upShiftSolenoid,OUTPUT);
   pinMode(downShiftSolenoid,OUTPUT);
-
+  pinMode(shiftCut, OUTPUT);                                          
   digitalWrite(shiftCut, LOW);
   Serial.begin(9600);
 }
@@ -21,11 +21,12 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   if(digitalRead(upShiftButton) == LOW){
+    
     doUpShift();
   }
-  if(digitalRead(downShiftButton) == LOW){
-    doDownShift();
-  }
+//  if(digitalRead(downShiftButton) == LOW){
+//    doDownShift();
+//  }
 }
 
 void doUpShift(){
