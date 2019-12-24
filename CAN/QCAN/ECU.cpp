@@ -7,11 +7,7 @@
 #include "ECU.h"
 
 ECU::ECU() {}
-int ECU::begin(int CS_PIN) {
-  _CAN = MCP_CAN(CS_PIN);
-  int status = _CAN.begin(CAN_250KBPS);
-  return status == CAN_OK;
-}
+void ECU::begin(MCP_CAN CAN) { _CAN = CAN; }
 
 int readUnsigned(unsigned char lowByte, unsigned char highByte) {
   return (highByte * 256) + lowByte;
@@ -34,13 +30,16 @@ void ECU::update() {
   if (CAN_MSGAVAIL == _CAN.checkReceive()) {
     _CAN.readMsgBuf(&msgLen, msgBuf);
     unsigned long id = _CAN.getCanId();
+    Serial.print("Observed ID ");
+    Serial.println(id, HEX);
     // TODO: update object's public vars with new CAN data
     // develop general function for each type of read (unsigned, signed
     // etc.) See ECU datasheet and old CAN code
     switch (id) {
     case PE1:
       // This message provides RPM, TPS, fuel open time and ignition angle
-
+      this->rpm = readUnsigned(msgBuf[0], msgBuf[1]);
+      this->tps = readSigned(msgBuf[2], msgBuf[3]);
       break;
     }
   }

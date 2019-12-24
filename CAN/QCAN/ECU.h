@@ -8,7 +8,7 @@
 class ECU {
 public:
   ECU();
-  int begin(int CS_PIN);
+  void begin(MCP_CAN CAN);
   void update();
   int rpm;
   float tps;
