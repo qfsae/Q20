@@ -1,6 +1,7 @@
 /*
   Definitions of all the CAN IDs for each message given by the ECU.
-  Refer to the Documentation in the Q20 GitHub for the data contained in each message data frame.
+  Refer to the Documentation in the Q20 GitHub for the data contained in each
+  message data frame.
 */
 
 // Mask Definition
@@ -27,3 +28,5 @@
 #define PE14 0x0CFFFD48
 #define PE15 0x0CFFFE48
 #define PE16 0x0CFFD048
+
+// TODO: add IFDEF that changes addresses between full and masked versions

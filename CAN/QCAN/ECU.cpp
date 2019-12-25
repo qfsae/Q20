@@ -6,6 +6,8 @@
 
 #include "ECU.h"
 
+#define DEBUG_MODE 0
+
 ECU::ECU() {}
 void ECU::begin(MCP_CAN CAN) { _CAN = CAN; }
 
@@ -33,10 +35,13 @@ void ECU::update() {
   if (CAN_MSGAVAIL == _CAN.checkReceive()) {
     _CAN.readMsgBuf(&msgLen, msgBuf);
     unsigned long id = _CAN.getCanId();
-    Serial.print("Observed ID ");
-    Serial.println(id, HEX);
-    Serial.print("MSG Length ");
-    Serial.println(msgLen);
+
+    if (DEBUG_MODE) {
+      Serial.print("Observed ID ");
+      Serial.println(id, HEX);
+      Serial.print("MSG Length ");
+      Serial.println(msgLen);
+    }
     // TODO: update object's public vars with new CAN data
     // develop general function for each type of read (unsigned, signed
     // etc.) See ECU datasheet and old CAN code
@@ -63,9 +68,21 @@ void ECU::update() {
       break;
     case PE4:
       // Provides readings for last 4 analog inputs
-      for (int i = 0; i < 4; i++) {
-        // update array here
+      for (int i = 0; i < 8; i += 2) {
+        this->analogInputs[4 + i / 2] =
+            scaleReading(readSigned(msgBuf[i], msgBuf[i + 1]), 0.001);
       }
+      break;
+    case PE5:
+      for (int i = 0; i < 8; i += 2) {
+        this->frequencies[i / 2] =
+            scaleReading(readSigned(msgBuf[i], msgBuf[i + 1]), 0.2);
+      }
+      break;
+    case PE6:
+      break;
+    case PE7:
+      break;
     }
   }
 }

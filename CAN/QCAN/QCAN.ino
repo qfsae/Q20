@@ -6,6 +6,8 @@
 
   TODO: Formalize this into a MOCK ECU class which can take a custom data struct
   updated in a real time from another source such as number gen or racing sim
+  NOTE: This is complete spaghetti code that I have simply using to test my
+  library's to read the simulated ECU messages as I go along
 */
 
 #include "DEFS.h"
@@ -113,12 +115,61 @@ void printPE3() {
   Serial.println(ECU.analogInputs[3]);
 }
 
+void testPE4() {
+  unsigned char message[8];
+  message[0] = 200;
+  message[2] = 100;
+  message[4] = 50;
+  message[6] = 25;
+  message[7] = 0;
+  CAN.sendMsgBuf(PE4, 1, 8, message);
+}
+
+void printPE4() {
+  Serial.print("INPUT 5 = ");
+  Serial.print(ECU.analogInputs[4]);
+
+  Serial.print(", INPUT 6 = ");
+  Serial.print(ECU.analogInputs[5]);
+
+  Serial.print(", INPUT 7 = ");
+  Serial.print(ECU.analogInputs[6]);
+
+  Serial.print(", INPUT 8 = ");
+  Serial.println(ECU.analogInputs[7]);
+}
+
+void testPE5() {
+  unsigned char message[8];
+  for (int i = 0; i < 8; i++) {
+    message[i] = 0;
+  }
+  message[0] = 200;
+  message[2] = 100;
+  message[4] = 50;
+  message[6] = 25;
+  CAN.sendMsgBuf(PE5, 1, 8, message);
+}
+void printPE5() {
+  Serial.print("INPUT 1 = ");
+  Serial.print(ECU.frequencies[0]);
+
+  Serial.print(", INPUT 2 = ");
+  Serial.print(ECU.frequencies[1]);
+
+  Serial.print(", INPUT 3 = ");
+  Serial.print(ECU.frequencies[2]);
+
+  Serial.print(", INPUT 4 = ");
+  Serial.println(ECU.frequencies[3]);
+}
+
 void loop() {
   if (SENDING) {
     // SEND FAKE MESSAGES HERE
-    testPE3();
+    testPE5();
   } else {
     ECU.update();
-    printPE3();
+    printPE5();
   }
 }
