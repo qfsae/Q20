@@ -23,6 +23,9 @@ int readSigned(unsigned char lowByte, unsigned char highByte) {
 
 float scaleReading(int reading, float factor) { return reading * factor; }
 
+// Updates the public variables on the object when a new message is received
+// Running this update function in the loop of an Arduino sketch gives easy
+// access to the latest ECU values
 void ECU::update() {
   unsigned char msgBuf[8];
   unsigned char msgLen;
@@ -32,6 +35,8 @@ void ECU::update() {
     unsigned long id = _CAN.getCanId();
     Serial.print("Observed ID ");
     Serial.println(id, HEX);
+    Serial.print("MSG Length ");
+    Serial.println(msgLen);
     // TODO: update object's public vars with new CAN data
     // develop general function for each type of read (unsigned, signed
     // etc.) See ECU datasheet and old CAN code
@@ -39,8 +44,28 @@ void ECU::update() {
     case PE1:
       // This message provides RPM, TPS, fuel open time and ignition angle
       this->rpm = readUnsigned(msgBuf[0], msgBuf[1]);
-      this->tps = readSigned(msgBuf[2], msgBuf[3]);
+      this->tps = scaleReading(readSigned(msgBuf[2], msgBuf[3]), 0.1);
+      this->openTime = scaleReading(readSigned(msgBuf[4], msgBuf[5]), 0.1);
+      this->ignitionAngle = scaleReading(readSigned(msgBuf[6], msgBuf[7]), 0.1);
       break;
+    case PE2:
+      this->pressure = scaleReading(readSigned(msgBuf[0], msgBuf[1]), 0.01);
+      this->MAP = scaleReading(readSigned(msgBuf[2], msgBuf[3]), 0.01);
+      this->lambda = scaleReading(readSigned(msgBuf[4], msgBuf[5]), 0.01);
+      this->pressureUnit = readUnsigned(msgBuf[6], msgBuf[7]);
+      break;
+    case PE3:
+      // Provides readings on first 4 analog inputs
+      for (int i = 0; i < 8; i += 2) {
+        this->analogInputs[i / 2] =
+            scaleReading(readSigned(msgBuf[i], msgBuf[i + 1]), 0.001);
+      }
+      break;
+    case PE4:
+      // Provides readings for last 4 analog inputs
+      for (int i = 0; i < 4; i++) {
+        // update array here
+      }
     }
   }
 }

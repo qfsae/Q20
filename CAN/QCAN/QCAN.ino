@@ -3,11 +3,16 @@
   Library will build atop the CAN shield library to retrieve ECU and PDM
   messages This sketch will use the underlying library to make a CAN sniffer
   which will print the ECU and PDM messages
+
+  TODO: Formalize this into a MOCK ECU class which can take a custom data struct
+  updated in a real time from another source such as number gen or racing sim
 */
 
 #include "DEFS.h"
 #include "ECU.h"
 #define SENDING 0
+// Boolean to indicate we are using extended CAN Addresses
+#define EXTENDED 1
 #define SPI_CS_PIN 9
 
 MCP_CAN CAN(SPI_CS_PIN);
@@ -28,21 +33,92 @@ void setup() {
   ECU.begin(CAN);
 }
 
+void testPE1() {
+  int fakeRPM = 200;
+  int fakeTPS = 50;
+  int fakeOpenTime = 70;
+  int fakeAngle = 200;
+  unsigned char testMessage[8];
+  testMessage[0] = fakeRPM;
+  testMessage[2] = fakeTPS;
+  testMessage[4] = fakeOpenTime;
+  testMessage[6] = fakeAngle;
+  CAN.sendMsgBuf(PE1, 1, 8, testMessage);
+}
+
+void printPE1() {
+  Serial.print("RPM = ");
+  Serial.print(ECU.rpm);
+
+  Serial.print(", TPS = ");
+  Serial.print(ECU.tps);
+
+  Serial.print(", OPEN_TIME = ");
+  Serial.print(ECU.openTime);
+
+  Serial.print(", IGNIT_ANGLE = ");
+  Serial.println(ECU.ignitionAngle);
+}
+
+void testPE2() {
+  int fakePressure = 200;
+  int fakeMAP = 200;
+  int fakeLambda = 100;
+  // 0 - psi, 1 - kpa
+  int fakeUnit = 1;
+  unsigned char message[8];
+  message[0] = fakePressure;
+  message[2] = fakeMAP;
+  message[4] = fakeLambda;
+  message[6] = fakeUnit;
+  message[7] = 0;
+  CAN.sendMsgBuf(PE2, 1, 8, message);
+}
+
+void printPE2() {
+  Serial.print("pressure = ");
+  Serial.print(ECU.pressure);
+
+  Serial.print(", MAP = ");
+  Serial.print(ECU.MAP);
+
+  Serial.print(", LAMBDA = ");
+  Serial.print(ECU.lambda);
+
+  Serial.print(", UNIT = ");
+  Serial.println(ECU.pressureUnit);
+}
+
+void testPE3() {
+  unsigned char message[8];
+  message[0] = 200;
+  message[2] = 100;
+  message[4] = 50;
+  message[6] = 100;
+  message[7] = 0;
+  CAN.sendMsgBuf(PE3, 1, 8, message);
+}
+
+void printPE3() {
+  Serial.print("INPUT 1 = ");
+  Serial.print(ECU.analogInputs[0]);
+
+  Serial.print(", INPUT 2 = ");
+  Serial.print(ECU.analogInputs[1]);
+
+  Serial.print(", INPUT 3 = ");
+  Serial.print(ECU.analogInputs[2]);
+
+  Serial.print(", INPUT 4 = ");
+  Serial.println(ECU.analogInputs[3]);
+}
+
 void loop() {
   if (SENDING) {
     // SEND FAKE MESSAGES HERE
-    // Send 200 rpm and 50 TPS;
-    int fakeRPM = 200;
-    int fakeTPS = 50;
-    unsigned char testMessage[8];
-    testMessage[0] = fakeRPM;
-    testMessage[2] = fakeTPS;
-    CAN.sendMsgBuf(PE1, 1, 8, testMessage);
+    testPE3();
   } else {
     ECU.update();
-    Serial.print("RPM = ");
-    Serial.print(ECU.rpm);
-    Serial.print(", TPS = ");
-    Serial.println(ECU.tps);
+    printPE3();
   }
 }
