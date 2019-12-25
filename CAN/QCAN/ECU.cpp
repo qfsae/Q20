@@ -6,7 +6,7 @@
 
 #include "ECU.h"
 
-#define DEBUG_MODE 0
+#define DEBUG_MODE 1
 
 ECU::ECU() {}
 void ECU::begin(MCP_CAN CAN) { _CAN = CAN; }
@@ -76,8 +76,18 @@ void ECU::update() {
       }
       break;
     case PE6:
+      this->batVoltage = readSigned(msgBuf[0], msgBuf[1], 0.01);
+      this->airTemp = readSigned(msgBuf[2], msgBuf[3], 0.1);
+      this->coolantTemp = readSigned(msgBuf[4], msgBuf[5], 0.1);
+      this->tempUnit = readUnsigned(msgBuf[6], msgBuf[7], 1);
       break;
     case PE7:
+      for (int i = 0; i < 4; i += 2) {
+        this->thermistors[i / 2] = readSigned(msgBuf[i], msgBuf[i + 1], 0.1);
+      }
+      this->versionMajor = readUnsigned(msgBuf[4], 0, 1);
+      this->versionMinor = readUnsigned(msgBuf[5], 0, 1);
+      this->versionBuild = readUnsigned(msgBuf[6], 0, 1);
       break;
     }
   }

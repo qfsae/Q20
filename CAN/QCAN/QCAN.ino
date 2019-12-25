@@ -150,6 +150,7 @@ void testPE5() {
   message[6] = 25;
   CAN.sendMsgBuf(PE5, 1, 8, message);
 }
+
 void printPE5() {
   Serial.print("INPUT 1 = ");
   Serial.print(ECU.frequencies[0]);
@@ -164,12 +165,68 @@ void printPE5() {
   Serial.println(ECU.frequencies[3]);
 }
 
+void testPE6() {
+  unsigned char message[8];
+  for (int i = 0; i < 8; i++) {
+    message[i] = 0;
+  }
+  message[0] = 200;
+  message[2] = 100;
+  message[4] = 200;
+  message[6] = 1;
+  CAN.sendMsgBuf(PE6, 1, 8, message);
+}
+
+void printPE6() {
+  Serial.print("INPUT 1 = ");
+  Serial.print(ECU.batVoltage);
+
+  Serial.print(", INPUT 2 = ");
+  Serial.print(ECU.airTemp);
+
+  Serial.print(", INPUT 3 = ");
+  Serial.print(ECU.coolantTemp);
+
+  Serial.print(", INPUT 4 = ");
+  Serial.println(ECU.tempUnit);
+}
+
+void testPE7() {
+  unsigned char message[8];
+  for (int i = 0; i < 8; i++) {
+    message[i] = 0;
+  }
+  message[0] = 200;
+  message[2] = 100;
+  message[4] = 0;
+  message[5] = 1;
+  message[6] = 0;
+  CAN.sendMsgBuf(PE7, 1, 8, message);
+}
+
+void printPE7() {
+  Serial.print("INPUT 1 = ");
+  Serial.print(ECU.thermistors[0]);
+
+  Serial.print(", INPUT 2 = ");
+  Serial.print(ECU.thermistors[1]);
+
+  Serial.print(", INPUT 3 = ");
+  Serial.print(ECU.versionMajor);
+
+  Serial.print(", INPUT 4 = ");
+  Serial.print(ECU.versionMinor);
+
+  Serial.print(", INPUT 5 = ");
+  Serial.println(ECU.versionBuild);
+}
+
 void loop() {
   if (SENDING) {
     // SEND FAKE MESSAGES HERE
-    testPE5();
+    testPE7();
   } else {
     ECU.update();
-    printPE5();
+    printPE7();
   }
 }
