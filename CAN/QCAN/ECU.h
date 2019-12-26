@@ -2,14 +2,13 @@
 #define ECU_h
 
 #include "Arduino.h"
-#include "mcp_can.h"
 #include <SPI.h>
 
 class ECU {
 public:
   ECU();
-  void begin(MCP_CAN CAN);
-  void update();
+  void update(unsigned long id, unsigned char msgBuf[], unsigned char msgLen);
+  void debugPrint(unsigned long id);
   int rpm;
   float tps;
   float openTime;
@@ -28,11 +27,6 @@ public:
   unsigned char versionMajor;
   unsigned char versionMinor;
   unsigned char versionBuild;
-  // TODO: Add variables for page 2 of ECU Datasheet
-
-private:
-  int _CS_PIN;
-  MCP_CAN _CAN;
 };
 
 #endif

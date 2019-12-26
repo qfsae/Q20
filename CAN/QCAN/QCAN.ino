@@ -10,10 +10,17 @@
 
 #include "DEFS.h"
 #include "ECU.h"
+#include "mcp_can.h"
+
+// Use pin 10 for CAN shield version 1.2
 #define SPI_CS_PIN 9
 
 MCP_CAN CAN(SPI_CS_PIN);
 ECU ECU;
+
+unsigned long id;
+unsigned char buf[8];
+unsigned char len;
 
 void setup() {
   Serial.begin(115200);
@@ -23,7 +30,14 @@ void setup() {
     delay(10000);
   }
   Serial.println("Initialization Success");
-  ECU.begin(CAN);
 }
 
-void loop() { ECU.update(); }
+void loop() {
+  if (CAN_MSGAVAIL == CAN.checkReceive()) {
+    CAN.readMsgBuf(&len, buf);
+    id = CAN.getCanId();
+    ECU.update(id, buf, len);
+    ECU.debugPrint(id);
+  }
+  delay(100);
+}
