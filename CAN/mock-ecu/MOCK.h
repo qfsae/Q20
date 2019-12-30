@@ -1,13 +1,10 @@
-#ifndef ECU_h
-#define ECU_h
+#ifndef MOCK_h
+#define MOCK_h
 
 #include "Arduino.h"
+#include "mcp_can.h"
 
-class ECU {
-public:
-  ECU();
-  void update(unsigned long id, unsigned char msgBuf[], unsigned char msgLen);
-  void debugPrint(unsigned long id);
+struct ECUData {
   int rpm;
   float tps;
   float openTime;
@@ -26,6 +23,12 @@ public:
   unsigned char versionMajor;
   unsigned char versionMinor;
   unsigned char versionBuild;
+};
+
+class MockECU {
+public:
+  MockECU();
+  void sendData(ECUData d, MCP_CAN C);
 };
 
 #endif

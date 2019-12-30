@@ -1,11 +1,10 @@
 #include "Arduino.h"
-#include <SPI.h>
 
 #include "DEFS.h"
 
 #include "ECU.h"
 
-#define DEBUG_MODE 1
+#define DEBUG_MODE 0
 
 ECU::ECU() {}
 

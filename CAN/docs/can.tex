@@ -2,7 +2,7 @@
 \usepackage[pass]{geometry}
 
 \usepackage{hyperref}
-\hypersetup{colorlinks,urlcolor=blue}
+\hypersetup{colorlinks,urlcolor=blue,linkcolor=blue}
 
 \usepackage{tabularx}
 \usepackage{array}
@@ -147,8 +147,8 @@ two node network. \lstinline{SENDING} is a boolean value which determines whethe
 Arduino will read or write data to the bus.
 
 \subsection{Testbench Setup}
+\label{sec:setup}
 To get the CAN testbench up and running, the following items are required:
-
 
 \begin{enumerate}
 \item Two Arduino Uno Boards
@@ -175,7 +175,8 @@ To get the CAN testbench up and running, the following items are required:
   \end{itemize}
 \item Start the test bench by uploading the sender code to one Arduino and the
   receiver code to the other. The output can then be read from the Serial
-  monitor.
+  monitor. \lstinline{SENDING} shall be set to 1 to obtain sender code and 0 to
+  have receiver code.
 \end{enumerate}
 
 The configured testbench serves as a ``jumping off point" for other CAN related
@@ -194,21 +195,72 @@ resistor is marked by a white rectangle.
 \end{center}
 
 \section{ECU Documentation}
-Attached to the end of this document is an excerpt from the ECU datasheet which
+Attached below is an excerpt from the ECU datasheet which
 gives a list of the CAN IDs and the contents of the data section of those
 messages. This document should always be used as a reference when determining
 priority of existing messages being sent over the bus and when selecting CAN IDs
 for new messages.\\
 
-TODO:
-\begin{itemize}
-  \item Document CAN library and retrieving ECU messages using the testbench.
-\end{itemize}
-
 \includepdf[page = {1,2}]{PE3-ECU-CAN-Protocols}
 
 \subsection{ECU Arduino Library}
+% Update this when the library covers all CAN messages sent by the PE3 ECU
 QFSAE is developing a library to read these ECU message built atop the
-CAN shield library.
+CAN shield library. Currently, the library can read all the messages on page 1
+of the datasheet provided above. The library exposes an \lstinline{ECU} class
+which has global variables containing each of the values transmitted by
+the ECU in CAN message IDs PE1 - PE7. The values are kept up to date with the
+latest ECU message transmission by passing the data in each CAN message from the
+ECU into the object's \lstinline{update()} method. The class definition for the
+ECU object is given below followed by the code for an ECU testbench.\\
+
+\lstset{basicstyle=\ttfamily\scriptsize}
+\lstinputlisting[language=C++, title=ECU Testbench]{../QCAN/QCAN.ino}
+\lstset{basicstyle=\ttfamily}
+
+The code assumes that an Arduino and CAN shield are connected to the same CAN
+bus as the ECU. Using the CAN shield library, messages are received and passed
+into the \lstinline{update()} function along with their ID. This updates the
+appropriate variables with their new values given in the message. The call to
+\lstinline{debugPrint()} uses the ID to determine which values received an
+update from the ECU and prints them to the serial monitor.
+
+\subsection{Mock ECU}
+The Mock ECU library sends out CAN messages with the same IDs as the PE3 ECU.
+The library exposes a Mock ECU object which takes a structure containing the values
+to send. The following demo sketch sends a set of static ECU values in a loop
+but the values could be easily populated dynamically by extending the code.
+
+\lstset{basicstyle=\ttfamily\scriptsize}
+\lstinputlisting[language=C++, title=Mock ECU Transmitter]{../mock-ecu/mock-ecu.ino}
+
+\section{CAN Interrupts}
+There are many cases on the Formula car where CAN messages need to be sent
+between devices on the car based on an event such as a gear shift or throttle
+position threshold. Since CAN is a priority bus where the lower addresses have
+higher priority, a low address should be used for interrupt based messages since
+they are only fired once for a certain event taking place and must be able to
+overtake lower priority messages that will simply be sent again such as an RPM
+update. Given below is some example code which emulates the up and down shift
+CAN functionality on the car.\\
+\\
+\\
+
+\lstinputlisting[language=C++, title=CAN Pin Interrupt]{../interrupts/interrupts.ino}
+\lstset{basicstyle=\ttfamily}
+
+The code maps buttons to each of the Arduino Uno's pin change interrupts. One
+button triggers the \lstinline{downShift()} method, which decreases the gear and
+the other calls the \lstinline{upShift()} method increasing the gear. The two
+interrupts are configured on Pins 2 and 3, which are the interrupt pins on
+Arduino Uno, this will need to be changed to the appropriate pin depending on the
+Arduino being used. The interrupt triggers on the falling edge of the signal
+from the button since a pull-up resistor was used in the test circuit. However,
+this should be changed to a rising edge configuration if a pull-down resistor is
+used. Similarly to the CAN testbench code, The pin interrupt test code provides
+a \lstinline{SENDING} boolean, which lets the user toggle whether the sketch is
+receiving or sending the CAN messages from the pin interrupts. See 
+\autoref{sec:setup} for in depth instructions for setting up a
+sender and receiver Arduino.
 
 \end{document}
