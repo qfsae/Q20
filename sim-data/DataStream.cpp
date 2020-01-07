@@ -64,7 +64,7 @@ HANDLE hSerial;
 bool status;
 
 int initSerial() {
-	TCHAR comPort[] = TEXT("\\\\.\\COM7");
+	TCHAR comPort[] = TEXT("\\\\.\\COM9");
 	hSerial = CreateFile(comPort,
 	GENERIC_READ | GENERIC_WRITE,
 	0,
@@ -82,7 +82,7 @@ int initSerial() {
 		DCB dcbSerialParams = { 0 };
 		dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
 		status = GetCommState(hSerial, &dcbSerialParams);
-		dcbSerialParams.BaudRate = CBR_115200;
+		dcbSerialParams.BaudRate = 115200;
 		dcbSerialParams.ByteSize = 8;
 		dcbSerialParams.StopBits = ONESTOPBIT;
 		dcbSerialParams.Parity = NOPARITY;
@@ -157,9 +157,9 @@ int _tmain(int argc, _TCHAR* argv[])
 			&dNoOfBytesWritten,
 			NULL);
 
-		//wcout << lpBuffer << endl;
+		// wcout << lpBuffer << endl;
 		// printData("speed kmh", pf->speedKmh);
-        Sleep(5);
+        // Sleep(5);
 		// if (GetAsyncKeyState(0x31) != 0) // user pressed 1
 		// {
 		// 	wcout << "---------------PHYSICS INFO---------------" << endl;
