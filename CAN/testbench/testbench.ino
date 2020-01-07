@@ -2,13 +2,13 @@
 // runs between two CAN shields and adjusts the brightness of an LED
 // connected to the receiver based off potentiometer readings from the sender
 
-#include <SPI.h>
 #include "mcp_can.h"
+#include <SPI.h>
 
 #define SPI_CS_PIN 9
 
 // Set to 0 to run receiver code
-#define SENDING 1
+#define SENDING 0
 
 // LED and Potentiometer Definitions
 #define LED_CATHODE 7
@@ -28,7 +28,7 @@ void setup() {
   pinMode(LED_PWM, OUTPUT);
   digitalWrite(LED_CATHODE, LOW);
 
-  //SETUP POTENTIOMETER FOR BRIGHTNESS READ
+  // SETUP POTENTIOMETER FOR BRIGHTNESS READ
   pinMode(POT_VCC, OUTPUT);
   pinMode(POT_WIPER, INPUT); // WIPER PIN
   pinMode(POT_GND, OUTPUT);
@@ -60,7 +60,8 @@ void loop() {
       Serial.print(buf[i]);
       Serial.print("\t");
     }
-    // Brightness of LED depends on potentiometer position on the sending CAN node
+    // Brightness of LED depends on potentiometer position on the sending CAN
+    // node
     Serial.print("writing to LED: ");
     Serial.println(buf[0]);
     analogWrite(LED_PWM, buf[0]);
