@@ -13,7 +13,7 @@
 #include "mcp_can.h"
 
 // Use pin 10 for CAN shield version 1.2
-#define SPI_CS_PIN 9
+#define SPI_CS_PIN 10
 
 MCP_CAN CAN(SPI_CS_PIN);
 ECU ECU;
@@ -39,5 +39,4 @@ void loop() {
     ECU.update(id, buf, len);
     ECU.debugPrint(id);
   }
-  delay(100);
 }
