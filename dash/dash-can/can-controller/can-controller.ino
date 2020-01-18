@@ -12,14 +12,13 @@ void setup() {
 //  }
 //  Serial.println("CAN Bus Initialized!")
 Serial.begin(115200);
-Serial.write(5);
-Serial.write('\n');
-Serial.write(5);
-Serial.write('\n');
 }
 
 void loop() {
-
+    for (unsigned char i = 0; i < 200; i++) {
+        Serial.write(i);
+        delay(250);
+    }
 //   unsigned char len = 0;
 //   unsigned char buf[8];
 //   if (CAN_MSGAVAIL == CAN.checkReceive()) {

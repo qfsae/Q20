@@ -41,6 +41,7 @@ void loop() {
   if (USerial.available() > 0) {
     buf = USerial.read();
     Serial.println(buf);
+    rpm = buf;
   }
   GD.ClearColorRGB(0,0,0);
   GD.Clear();
