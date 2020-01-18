@@ -21,3 +21,4 @@ sim-data/.vscode/settings.json
 
 # Misc
 *.DS_Store
+*.vscode
