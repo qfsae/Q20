@@ -4,18 +4,31 @@
 
 // the cs pin of the version after v1.1 is default to D9
 // v0.9b and v1.0 is default D10
-const int SPI_CS_PIN = 10;
+const int SPI_CS_PIN = 53;
+const int downBut   =   18; //Button from Paddle Shifts
+const int upBut   =   19;
+
+const int upSol    = 27; //Signal to upshift solenoid
+const int downSol =   26; //Signal to downshift solenoid 
+
 MCP_CAN CAN(SPI_CS_PIN);                                    // Set CS pin
 
 void setup()
 {
+  pinMode(downBut, INPUT);
+  pinMode(upBut, INPUT);
+  pinMode(upSol, OUTPUT);
+  pinMode(downSol, OUTPUT);
+//  attachInterrupt(upBut, manualUpShift, LOW);
+//  attachInterrupt(downBut, manualDownShift, LOW);
+  
     Serial.begin(115200);
 
     while (CAN_OK != CAN.begin(CAN_250KBPS))              // init can bus : baudrate = 500k
     {
         Serial.println("CAN BUS Shield init fail");
         Serial.println(" Init CAN BUS Shield again");
-        delay(10000);
+        delay(1);
     }
     Serial.println("CAN BUS Shield init ok!");
 }
@@ -26,11 +39,30 @@ float fuel = 0;
 float batVolt = 0;
 float Coolant = 0;
 
+
+void loop(){
+  if(digitalRead(upBut) == 0){
+    Serial.println("Upshifting");
+        digitalWrite(upSol, HIGH);
+      delay(1000);
+      
+      digitalWrite(upSol, LOW);
+  }
+  if(digitalRead(downBut) == 0){
+    Serial.println("Downshifting");
+        digitalWrite(downSol, HIGH);
+      delay(1000);
+      
+      digitalWrite(downSol, LOW);
+  }
+  
+}
+/*
 void loop()
 {
     unsigned char len = 0;
     unsigned char buf[8];
-    Serial.println("In loop");
+    //Serial.println("In loop");
     
     if(CAN_MSGAVAIL == CAN.checkReceive())            // check if data coming
     {
@@ -94,6 +126,16 @@ void loop()
     }
 }
 
+void manualUpShift(){
+  
+}
+void manualDownShift(){
+  Serial.println("Downshifting");
+      digitalWrite(downSol, HIGH);
+      delay(1000);
+      digitalWrite(downSol, LOW);  
+}
+*/
 /*********************************************************************************************************
   END FILE
 *********************************************************************************************************/
