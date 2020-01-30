@@ -83,11 +83,12 @@ void setup()
   digitalWrite(shiftCut, HIGH);
   digitalWrite(upLED, HIGH);
   digitalWrite(downLED, HIGH);
-
-//  while (CAN.begin(CAN_500KBPS) != CAN_OK)
-//  {
-//    delay(100);
-//  }
+//
+  while (CAN.begin(CAN_500KBPS) != CAN_OK)
+  {
+    Serial.println("Connecting to CAN");
+    delay(100);
+  }
 
   digitalWrite(shiftCut, LOW);
   digitalWrite(upLED, LOW);
@@ -188,21 +189,12 @@ void parseData() {      // split the data into its parts
 
 void loop()
 {
-  if(digitalRead(downButton) == LOW){ downshift(); }
-  if(digitalRead(upButton) == LOW) { upshift(); }
+//  if(digitalRead(downButton) == LOW){ downshift(); }
+//  if(digitalRead(upButton) == LOW) { upshift(); }
   if(digitalRead(toggle) == HIGH){
     SIM = 1;
   } else { SIM = 0; }
-  recvWithStartEndMarkers();
-    if (newData == true) {
-        strcpy(tempChars, receivedChars);
-            // this temporary copy is necessary to protect the original data
-            //   because strtok() used in parseData() replaces the commas with \0
-        parseData();
-        //showParsedData();
-        newData = false;
-    }
-
+  
     BSPD = analogRead(BSPDFlag);
 
     Brake = analogRead(BrakePres);
@@ -231,8 +223,8 @@ void loop()
     if (SIM)
     {
       // put stuff to receive from CAN here
-      
-      APPS1 = tps_sim*1024; // It would read this from CAN
+      receiveCAN();
+      APPS1 = tps_sim*10; // It would read this from CAN
     }
     else
     {
@@ -244,10 +236,10 @@ void loop()
     {
       APPS1 = 0;
     }
-    Serial.print(APPS1);
+//    Serial.print(APPS1);
     Input = APPS1 - TPS;
-    Serial.print("\t");
-    Serial.println(Input);
+//    Serial.print("\t");
+//    Serial.println(Input);
     if (Input < 0)
     {
       myPID.SetControllerDirection(DIRECT);
@@ -263,22 +255,37 @@ void loop()
 
     myPID.Compute();
     analogWrite(torquePin, OutputTorque);
+//    printSerial();
     lastGear = gear;
 }
 
+void printSerial(){
+  Serial.print(APPS1);
+  Serial.print("\t");
+  Serial.print(TPS1);
+  Serial.print("\t");
+  Serial.print(Input);
+  Serial.print("\t");  
+}
 
 void receiveCAN()
 {
   unsigned char len = 0;
-  unsigned char buf[8];
-
-  // Need to receive tps and gear over CAN
-  if(CAN_MSGAVAIL == CAN.checkReceive()){
-    CAN.readMsgBuf(&len, buf);
+    unsigned char buf[8];
+    if (CAN_MSGAVAIL == CAN.checkReceive()) // Receive CAN messages from sim
+    {
+         CAN.readMsgBuf(&len, buf);
     unsigned long id = CAN.getCanId();
-    int tps = buf[2];
-    gear = buf[3];
-  }
+    Serial.print("Getting Data from ID: ");
+    Serial.println(id, HEX);
+
+    for (int i = 0; i < len; i++) {
+      Serial.print(buf[i]);
+      Serial.print("\t");
+    }
+    }
+    tps_sim = buf[2];
+    if(tps_sim > 100){ tps_sim = 100; }
 }
 
 void transmitCAN()

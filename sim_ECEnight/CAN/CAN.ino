@@ -10,6 +10,11 @@ MCP_CAN CAN(SPI_CS_PIN);
 byte gear;
 int rpm;
 float tps;
+const byte numChars = 32;
+char receivedChars[numChars];
+char tempChars[numChars];            // temporary array for use when parsing
+
+boolean newData = false;
 
 void setup() {
   Serial.begin(115200);
@@ -85,21 +90,15 @@ void loop() {
         newData = false;
     }
 
-    if(!(CAN_MSGAVAIL == CAN.checkReceive())) {
-        unsigned char rpmMsg[4]; // is 4 long enough?
-        unsigned char tpsMsg[4];
-        unsigned byte gearMsg;
-        
-        unsigned long rpmID = 0x00;
-        unsigned long tpsID = 0x08;
-        unsigned long gearID = 0xC0;
+    if(CAN_MSGAVAIL == CAN.checkReceive()){
+      
+    } else {
+        unsigned char message[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+        unsigned long sendingID = 0x00;
+        message[0] = gear;
+        message[1] = tps;
+        message[2] = rpm;
 
-        rpmMsg[0] = rpm;
-        tpsMsg[0] = tps;
-        gearMsg = gear;
-
-        CAN.sendMsgBuf(rpmID, 0, 4, rpmMsg);
-        CAN.sendMsgBuf(tpsID, 0, 4, tpsMsg);
-        CAN.sendMsgBuf(gearID, 0, 4, gearMsg);
+        CAN.sendMsgBuf(sendingID, 0, 8, message);
     }
 }
