@@ -1,6 +1,7 @@
 /* Sample code for Steering Wheel Electronics with data from CAN from assetto
 - Need to add 14-seg to this
-- Also add potentiometer for neopixels
+- Also add potentiometer for neopixels (done)
+- Add button to 
 */
 #include <Adafruit_NeoPixel.h>
 #include "mcp_can.h"
@@ -56,11 +57,10 @@ void setup()
     //   Serial.println("CAN Bus Initialized!");
 }
 
-void loop()
-{
+void loop(){
     unsigned char len = 0;
     unsigned char buf[8];
-    if (CAN_MSGAVAIL == CAN.checkReceive())
+    if (CAN_MSGAVAIL == CAN.checkReceive()) // Receive CAN messages from sim
     {
         CAN.readMsgBuf(&len, buf);
         unsigned long id = CAN.getCanId();
@@ -100,60 +100,35 @@ void mapShiftLights()
     int maxRPM = 7500;
     int RPMi = map(rpm, 0, maxRPM, 0, LED_COUNT - 1);
 
-    switch()
-    for (int i = 0; i < RPMi; i++)
+    switch (pattern)
     {
-        if (i < (LED_COUNT / 3))
+    case 0: // Normal shift light pattern that we already have working
+        for (int i = 0; i < RPMi; i++)
         {
-            strip.setPixelColor(i, 0, brightness, 0);
+            if (i < LED_COUNT/3) // First third
+            {
+                strip.setPixelColor(i, 0, brightness, 0); // Green
+            }
+            else if (i < (2*LED_COUNT)/3)) // Second third
+            {
+                strip.setPixelColor(i, brightness, 0, 0); // Red
+            }
+            else // Last third
+            {
+                strip.setPixelColor(i, 0, 0, brightness); // Blue
+            }
         }
-        else if (i < (2 * LED_COUNT / 3))
-        {
-            strip.setPixelColor(i, 0, 0, brightness);
-        }
-        else
-        {
-            strip.setPixelColor(i, brightness, 0, 0);
-        }
+        break;
+    case 1: // Want this to progress inwards
+        break;
+    default:
+        break;
     }
-    strip.show();
-
-    if (rpm < 1000 && rpm > 500)
-        strip.setPixelColor(0, 0, 255, 0); // last interval show all lights red
-    if (rpm < 1500)
-        strip.setPixelColor(1, 0, 255, 0);
-    if (rpm < 2000)
-        strip.setPixelColor(2, 0, 255, 0);
-    if (rpm < 2500)
-        strip.setPixelColor(3, 0, 255, 0);
-    if (rpm < 3000)
-        strip.setPixelColor(4, 0, 255, 0);
-    if (rpm < 3500)
-        strip.setPixelColor(5, 0, 0, 255);
-    if (rpm < 4000)
-        strip.setPixelColor(6, 0, 0, 255);
-    if (rpm < 4500)
-        strip.setPixelColor(7, 0, 0, 255);
-    if (rpm < 5000)
-        strip.setPixelColor(8, 0, 0, 255);
-    if (rpm < 5500)
-        strip.setPixelColor(9, 0, 0, 255);
-    if (rpm < 6000)
-        strip.setPixelColor(10, 255, 0, 0);
-    if (rpm < 6500)
-        strip.setPixelColor(11, 255, 0, 0);
-    if (rpm < 7000)
-        strip.setPixelColor(12, 255, 0, 0);
-    if (rpm < 7500)
-        strip.setPixelColor(13, 255, 0, 0);
-    if (rpm < 8000)
-        strip.setPixelColor(14, 255, 0, 0);
-    if (rpm < 8500)
-        batchPixels(0, 15, 255, 0, 0);
     strip.show();
 }
 
-void mapGear(){
+void mapGear()
+{
     // Reset Gears
     digitalWrite(A, LOW);
     digitalWrite(B, HIGH);
@@ -165,37 +140,43 @@ void mapGear(){
     digitalWrite(H, HIGH);
     digitalWrite(I, HIGH);
 
-    switch(gear){
-        case -1: // reverse
-            digitalWrite(A, HIGH);
-            digitalWrite(B, HIGH);
-            digitalWrite(E, HIGH);
-            digitalWrite(F, HIGH);
-            digitalWrite(G, HIGH);
-            digitalWrite(I, HIGH);
-            break;
-        case 0:
-            digitalWrite(B, HIGH);
-            digitalWrite(C, HIGH);
-            digitalWrite(E, HIGH);
-            digitalWrite(F, HIGH);
-            digitalWrite(H, HIGH);
-            digitalWrite(I, HIGH);
-            break;
-        case 1:
-            digitalWrite(B, HIGH);
-            digitalWrite(C, HIGH);
-            break;
-        case 2:
-            digitalWrite(A, HIGH);
-            digitalWrite(B, HIGH);
-            digitalWrite(G, HIGH);
-            digitalWrite(E, HIGH);
-            digitalWrite(D, HIGH);
-            break;
-        default:
-            // write nothing
-            break;
+    switch (gear)
+    {
+    case -1: // reverse
+        digitalWrite(A, HIGH);
+        digitalWrite(B, HIGH);
+        digitalWrite(E, HIGH);
+        digitalWrite(F, HIGH);
+        digitalWrite(G, HIGH);
+        digitalWrite(I, HIGH);
+        break;
+    case 0:
+        digitalWrite(B, HIGH);
+        digitalWrite(C, HIGH);
+        digitalWrite(E, HIGH);
+        digitalWrite(F, HIGH);
+        digitalWrite(H, HIGH);
+        digitalWrite(I, HIGH);
+        break;
+    case 1:
+        digitalWrite(B, HIGH);
+        digitalWrite(C, HIGH);
+        break;
+    case 2:
+        digitalWrite(A, HIGH);
+        digitalWrite(B, HIGH);
+        digitalWrite(G, HIGH);
+        digitalWrite(E, HIGH);
+        digitalWrite(D, HIGH);
+        break;
+    default:
+        // write nothing
+        break;
     }
     // Add code to map to the 14-segment display
+}
+
+void lightcycle()
+{
+    pattern++ %= 3; // Increment light pattern and wrap for 3 patterns
 }
