@@ -1,10 +1,10 @@
 #include <SPI.h>
 #include <GD23Z.h>
 
+
 void setup() {
   // put your setup code here, to run once:
   GD.begin(0);
-  
 }
 
 void driveScreen()
@@ -133,11 +133,15 @@ void etc_Screen()
   GD.cmd_number(380, 200, 30, OPT_CENTERX, 0);
 }
 
+
+
 void loop() {
   GD.ClearColorRGB(0,0,0);
   GD.Clear();
   driveScreen();
   //etc_Screen();
+
+  
   Serial.println(analogRead(A4));
 //  for(int i =0; i>0; i++)
 //  {
