@@ -64,7 +64,7 @@ HANDLE hSerial;
 bool status;
 
 int initSerial() {
-	TCHAR comPort[] = TEXT("\\\\.\\COM9");
+	TCHAR comPort[] = TEXT("\\\\.\\COM3");
 	hSerial = CreateFile(comPort,
 	GENERIC_READ | GENERIC_WRITE,
 	0,
