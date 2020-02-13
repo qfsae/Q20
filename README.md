@@ -1,6 +1,6 @@
 # Queen's Formula SAE Team - Q20
 
-Codebase and configurations for QFSAE Q20 team. The team is currently using MoTeC M150 ECU management, a PDM15 and L180 telemtry. 
+Codebase and configurations for QFSAE Q20 team. The team is currently using the MoTeC M150 ECU, PDM15 and L180. 
 
 This repository is used to maintain all of the code regarding CAN Bus protocol, the Q20 dash system, custom PCB projects and documentation for all other components of the electrical system. 
 
