@@ -12,7 +12,7 @@ unsigned char len;
 
 void setup() {
   Serial.begin(115200);
-  while (CAN_OK != CAN.begin(CAN_250KBPS)) {
+  while (CAN_OK != CAN.begin(CAN_500KBPS)) {
     Serial.println("CAN INIT FAIL");
     Serial.println("TRY AGAIN");
     delay(1000);

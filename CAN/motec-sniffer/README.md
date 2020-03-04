@@ -21,3 +21,7 @@
   (can still observe the messages being sent from PDM on Arduino but not through
   M1 Tune?)
 
+# Things to get from the data logger
+- Anything and everything from the PDM
+- Look into into session reset mechanism
+
