@@ -2,7 +2,7 @@
 #define SPI_CS_PIN 9
 #define SENDING 0
 #define ADDR 0x00
-
+// test commit from allin's computer
 volatile int gear = 1;
 volatile bool interrupted = false;
 
