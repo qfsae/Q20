@@ -1,13 +1,20 @@
 #include "mcp_can.h"
 #include <SPI.h>
 
+<<<<<<< HEAD
 #define BODY_LENGTH 4
+=======
+#define BODY_LENGTH 8
+>>>>>>> 43b08cf1f50674faea6cce34ea99dde48f36b35a
 
 #define SPI_CS_PIN 10
 
 MCP_CAN CAN(SPI_CS_PIN);
 
-unsigned char msg[6] = {0, 0, 0, 0, 0, 0};
+unsigned char msg[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+
+int endMarker = -20000;
+char *c = (char *)&endMarker;
 
 void setup() {
   Serial.begin(115200);
@@ -19,6 +26,7 @@ void setup() {
   }
   Serial.println("CAN Bus Initialized!");
 
+<<<<<<< HEAD
   // add endmarkers to message
   int endMarker = -20000;
   char *c = (char *)&endMarker;
@@ -28,17 +36,20 @@ void setup() {
 
   msg[0] = 200;
   msg[1] = 200;
+=======
+>>>>>>> 43b08cf1f50674faea6cce34ea99dde48f36b35a
 }
 
 void writeMsg() {
   for (int i = 0; i < BODY_LENGTH; i++) {
     Serial.write(msg[i]);
   }
-  Serial.write(msg[4]);
-  Serial.write(msg[5]);
+  Serial.write(c[0]);
+  Serial.write(c[1]);
 }
 
 void loop() {
+<<<<<<< HEAD
   unsigned char len = 0;
   unsigned char buf[8];
   if (CAN_MSGAVAIL == CAN.checkReceive()) {
@@ -53,4 +64,15 @@ void loop() {
     }
   }
   //delay(75);
+=======
+    unsigned char len = 0;
+    if (CAN_MSGAVAIL == CAN.checkReceive()) {
+      CAN.readMsgBuf(&len, msg);
+      unsigned long id = CAN.getCanId();
+     if (id == 0x7F0) {
+     	// msg[2] is the battery voltage divided by 0.1216
+	writeMsg();
+     }
+   }
+>>>>>>> 43b08cf1f50674faea6cce34ea99dde48f36b35a
 }
