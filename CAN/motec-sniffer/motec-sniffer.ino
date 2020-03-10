@@ -1,7 +1,7 @@
 #include "mcp_can.h"
 
 // Use pin 10 for CAN shield version 1.2
-#define SPI_CS_PIN 9
+#define SPI_CS_PIN 10
 // NOTE: Base Address for MOTEC M150 CAN is 0x07F0
 
 MCP_CAN CAN(SPI_CS_PIN);
@@ -12,7 +12,7 @@ unsigned char len;
 
 void setup() {
   Serial.begin(115200);
-  while (CAN_OK != CAN.begin(CAN_250KBPS)) {
+  while (CAN_OK != CAN.begin(CAN_500KBPS)) {
     Serial.println("CAN INIT FAIL");
     Serial.println("TRY AGAIN");
     delay(1000);
