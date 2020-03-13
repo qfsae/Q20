@@ -1,4 +1,5 @@
 #define USerial Serial1
+
 #define BODY_LENGTH 8
 
 int endMarker = -20000;
@@ -9,21 +10,23 @@ unsigned char buf[BODY_LENGTH];
 unsigned char msg[BODY_LENGTH];
 
 void arrCopy(unsigned char *src, unsigned char *dest) {
-  for (int i = 0; i < BODY_LENGTH; i++) {
+  for (int i = 0; i < n; i++) {
     dest[i] = src[i];
   }
 }
 
 void setup() {
   // put your setup code here, to run once:
+  //USerial.begin(115200);
   Serial.begin(115200);
-  USerial.begin(115200);
   delay(500);
   Serial.println("STARTING");
+  USerial.begin(115200);
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
+  //Serial.println("TESTING");
   if (USerial.available() >= 2) {
     Serial.println("RECV");
     char a = USerial.read();
@@ -37,6 +40,7 @@ void loop() {
       n += 2;
     }
   }
-  // TEST BY FETCHING BATTERY VOLTAGE
-  Serial.println(msg[2]);
+  float voltage = msg[2] * 0.1216;
+  Serial.println(voltage);
+  delay(100);
 }
