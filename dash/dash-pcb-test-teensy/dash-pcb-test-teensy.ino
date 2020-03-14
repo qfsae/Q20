@@ -1,5 +1,5 @@
+#define BAUD_RATE 1000000
 #define USerial Serial1
-
 #define BODY_LENGTH 4
 
 unsigned char n = 0;
@@ -17,14 +17,15 @@ void recvData() {
   char *endBytes = (char *)&endMarker;
   //Serial.println("RUN");
   if (USerial.available() >= 2) {
-    Serial.println("RECV");
+    //Serial.println("RECV");
     char a = USerial.read();
     char b = USerial.read();
     if (a == endBytes[0] && b == endBytes[1]) {
       // The message has ended
       n = 0;
-      arrCpy(data, currentMsg);
-      printCurrentMsg();
+      //arrCpy(data, currentMsg);
+      Serial.println(data[1]);
+      
     } else {
       data[n] = a;
       data[n + 1] = b;
@@ -44,22 +45,13 @@ void printCurrentMsg() {
 
 void setup() {
   // put your setup code here, to run once:
-  USerial.begin(115200);
-  Serial.begin(115200);
+  USerial.begin(BAUD_RATE);
+  Serial.begin(BAUD_RATE);
   delay(500);
-  Serial.println("yo");
+  Serial.println("STARTING");
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
   recvData();
-  float voltage = currentMsg[2];
-  Serial.println(voltage * 0.1216);
-  //Serial.println("LOOP");
-//  if (USerial.available() >= 1) {
-//    char letter = USerial.read();
-//    Serial.print(letter);  
-//  }
-  //delay(100);
-  //printCurrentMsg();
 }

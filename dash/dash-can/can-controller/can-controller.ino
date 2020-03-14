@@ -1,7 +1,10 @@
+// CAN CONTROLLER CODE FOR THE DASH
+
 #include "mcp_can.h"
 #include <SPI.h>
 
 #define BODY_LENGTH 4
+#define BAUD_RATE 1000000
 
 #define SPI_CS_PIN 10
 
@@ -10,7 +13,7 @@ MCP_CAN CAN(SPI_CS_PIN);
 unsigned char msg[6] = {0, 0, 0, 0, 0, 0};
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(BAUD_RATE);
   Serial.println("Starting");
   while (CAN.begin(CAN_500KBPS) != CAN_OK) {
     Serial.println("CAN BUS init failure");
@@ -31,11 +34,13 @@ void setup() {
 }
 
 void writeMsg() {
-  for (int i = 0; i < BODY_LENGTH; i++) {
-    Serial.write(msg[i]);
+  size_t idx = 0;
+  size_t bytesLeft = 6;
+  while (idx != 6) {
+    size_t written = Serial.write(&msg[idx], bytesLeft);
+    bytesLeft -= written;
+    idx += written;
   }
-  Serial.write(msg[4]);
-  Serial.write(msg[5]);
 }
 
 void loop() {
@@ -51,9 +56,7 @@ void loop() {
       msg[2] = buf[2];
       msg[1] = buf[1];
       writeMsg();
-      delay(100);
-      //Serial.println("GOT BAT VOlTAGE");
+      delay(100); // accomadate screen refresh rate
     }
   }
-  //delay(75);
 }
