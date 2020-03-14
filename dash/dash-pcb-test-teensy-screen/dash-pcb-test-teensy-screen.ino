@@ -1,6 +1,6 @@
 #include <EEPROM.h>
 #include <SPI.h>
-#include <GD23Z.h>
+#include <GD2.h>
 
 #define BAUD_RATE 1000000
 #define USerial Serial1
@@ -9,6 +9,8 @@
 unsigned char n = 0;
 unsigned char currentMsg[BODY_LENGTH];
 unsigned char data[BODY_LENGTH];
+
+bool canStarted = false;
 
 void arrCpy(unsigned char *src, unsigned char *dest) {
   for (int i = 0; i < BODY_LENGTH; i++) {
@@ -61,16 +63,38 @@ void screenUpdate() {
   GD.swap();
 }
 
+void startScreen() {
+  GD.Clear();
+  GD.Begin(BITMAPS);
+  GD.Vertex2ii(240 - 200, 40);
+  GD.cmd_text(240, 260, 21, OPT_CENTER, "Waiting for CAN bus");
+  GD.End();
+  
+  GD.cmd_spinner(240, 220, 1, 0);
+  
+  GD.swap();
+}
+
 void setup() {
   // put your setup code here, to run once:
   USerial.begin(BAUD_RATE);
   Serial.begin(BAUD_RATE);
   delay(500);
-  GD.begin(0);
+  GD.begin();
+  GD.cmd_loadimage(0, 0);
+  GD.load("qfsae.jpg");
   Serial.println("STARTING");
+  //while (!USerial.available());
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  recvData();
+  if (canStarted) {
+    recvData();  
+  } else {
+    startScreen();
+    if (USerial.available()) {
+      canStarted = true;
+    }  
+  }
 }
