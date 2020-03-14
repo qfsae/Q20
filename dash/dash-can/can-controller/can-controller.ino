@@ -55,8 +55,9 @@ void loop() {
       msg[3]++;
       msg[2] = buf[2];
       msg[1] = buf[1];
+      msg[0] = buf[0];
       writeMsg();
-      delay(100); // accomadate screen refresh rate
+      delay(100);
     }
   }
 }
