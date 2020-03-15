@@ -38,10 +38,4 @@ void setup() {
   printBuf(sendBuf, BODY_LENGTH);
 }
 
-void loop() {
-  if (SENDING) {
-    // write the encoded buf to UART
-  } else {
-    // do a decode of serial data here
-  }
-}
+void loop() {}
