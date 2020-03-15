@@ -13,6 +13,7 @@ extern "C" {
  *                 using COBS.
  * @param dest     The destination byte buffer for the encoded bytes.
  * @param data_len the length of the data buffer
+ * @return a boolean indicating whether the action was successful or not.
  */
 uint8_t fcobs_encode(uint8_t *data, uint8_t *dest, uint8_t data_len);
 
@@ -22,6 +23,7 @@ uint8_t fcobs_encode(uint8_t *data, uint8_t *dest, uint8_t data_len);
  * @param data     The COBS encoded data.
  * @param dest     The destination buffer for the decoded data.
  * @param data_len The length of the encoded buffer.
+ * @return a boolean indicating whether the action was successful or not.
  */
 uint8_t fcobs_decode(uint8_t *data, uint8_t *dest, uint8_t data_len);
 
