@@ -18,8 +18,6 @@ void startScreen() {
   
   GD.cmd_spinner(240, 220, 1, 0);
   
-  
-  
   GD.swap();
 }
 

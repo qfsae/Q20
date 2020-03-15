@@ -11,6 +11,7 @@ unsigned char currentMsg[BODY_LENGTH];
 unsigned char data[BODY_LENGTH];
 
 bool canStarted = false;
+int tps = 0;
 
 void arrCpy(unsigned char *src, unsigned char *dest) {
   for (int i = 0; i < BODY_LENGTH; i++) {
@@ -30,8 +31,10 @@ void recvData() {
       // The message has ended
       n = 0;
       //arrCpy(data, currentMsg);
-      Serial.println(data[1]);
-      screenUpdate();
+      if (data[3] == 0x01) {
+        screenUpdate();
+        //tps = data[1];
+      }
     } else {
       data[n] = a;
       data[n + 1] = b;
