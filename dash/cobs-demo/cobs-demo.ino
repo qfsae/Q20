@@ -33,6 +33,9 @@ void setup() {
   fcobs_encode(sendBuf, encodedBuf, BODY_LENGTH);
   Serial.println("Encoded Data: ");
   printBuf(encodedBuf, BODY_LENGTH + 2);
+  Serial.println("Decoded Data: ");
+  fcobs_decode(encodedBuf, sendBuf, BODY_LENGTH + 2);
+  printBuf(sendBuf, BODY_LENGTH);
 }
 
 void loop() {
