@@ -52,7 +52,7 @@ void loop() {
   sendBuffer[1] = tps++;
   CAN.sendMsgBuf(ECU1, 0, 8, sendBuffer);
   clearArr();
-  
+  //delay(25);
   // Send Battery Voltage
   sendBuffer[2] = 100; // pos 2 in the buffer is the battery voltage
   CAN.sendMsgBuf(PDM, 0, 8, sendBuffer);

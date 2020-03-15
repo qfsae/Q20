@@ -73,6 +73,6 @@ void loop() {
       msg[0] = buf[0]; // FAN STATUS ACTIVE
     }
     writeMsg();
-    delay(100);
+    delay(10);
   }
 }
