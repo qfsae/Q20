@@ -50,6 +50,12 @@ void loop() {
 
   sendBuffer[0] = rpm++;
   sendBuffer[1] = tps++;
+  sendBuffer[2] = 150; // speed
+  sendBuffer[3] = 100; // coolant temp
+  sendBuffer[4] = 50; // oil temp
+  sendBuffer[5] = 30; // fuel temp
+  sendBuffer[6] = 60; // transmission temp
+  sendBuffer[7] = 65; // differential temp
   CAN.sendMsgBuf(ECU1, 0, 8, sendBuffer);
   clearArr();
   delay(25);

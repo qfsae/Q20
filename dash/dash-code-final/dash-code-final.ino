@@ -7,6 +7,7 @@
 
 #define BAUD_RATE 1000000
 #define USerial Serial1
+
 #define BODY_LENGTH 4
 #define ENCODED_LENGTH BODY_LENGTH + 2
 
@@ -29,17 +30,19 @@ volatile int tps;
 volatile bool canStarted = false;
 
 void timerInterrupt() {
-  recvData();  
+  recvData();
 }
 
 void recvData() {
   if (USerial.available()) {
-    char a = USerial.read();
+    uint8_t a = USerial.read();
     if (a == 0) {
       // The message has ended
       fcobs_decode(data, currentMsg, ENCODED_LENGTH);
       n = 0;
-      if (currentMsg[3] == 0x01) {
+      //Serial.println(currentMsg[0]);
+      
+      if (currentMsg[3] == 0x10) {
         tps = currentMsg[1];
       }
     } else {
