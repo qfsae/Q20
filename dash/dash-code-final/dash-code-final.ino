@@ -11,6 +11,8 @@
 #define BODY_LENGTH 4
 #define ENCODED_LENGTH BODY_LENGTH + 2
 
+#define INTERRUPT_PRIORITY 0
+
 struct CANData {
   int rpm;
   uint8_t tps;
@@ -71,7 +73,7 @@ void setup() {
   GD.load("qfsae.jpg");
   Serial.println("STARTING");
   timer.begin(timerInterrupt, 100);
-  timer.priority(0); // set highest priority for this interrupt
+  timer.priority(INTERRUPT_PRIORITY); // set highest priority for this interrupt
 }
 
 void loop() {

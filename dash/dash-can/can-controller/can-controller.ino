@@ -104,6 +104,5 @@ void loop() {
       fcobs_encode(msgPDM, encodedPDM, PDM_BODY_LENGTH);
       writeMsg(encodedPDM, PDM_BODY_LENGTH_ENCODED);
     }
-    delay(5);
   }
 }
