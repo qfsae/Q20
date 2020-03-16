@@ -18,7 +18,7 @@ uint8_t sendBuffer[8];
 
 void startCAN() {
   Serial.println("Starting");
-  while (CAN.begin(CAN_500KBPS) != CAN_OK) {
+  while (CAN.begin(CAN_1000KBPS) != CAN_OK) {
     Serial.println("CAN BUS init failure");
     Serial.println("Trying again");
     delay(100);
@@ -52,7 +52,7 @@ void loop() {
   sendBuffer[1] = tps++;
   CAN.sendMsgBuf(ECU1, 0, 8, sendBuffer);
   clearArr();
-  //delay(25);
+  delay(25);
   // Send Battery Voltage
   sendBuffer[2] = 100; // pos 2 in the buffer is the battery voltage
   CAN.sendMsgBuf(PDM, 0, 8, sendBuffer);

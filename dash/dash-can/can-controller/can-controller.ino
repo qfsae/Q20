@@ -2,7 +2,7 @@
 
 #include "mcp_can.h"
 #include <SPI.h>
-#inlcude "fcobs.h"
+#include "fcobs.h"
 
 #define BODY_LENGTH 4
 #define BAUD_RATE 1000000
@@ -12,17 +12,18 @@
 #define PDM 0x7F0
 #define ECU1 0x118
 #define ECU2 0x119
+
 #define SPI_CS_PIN 10
 
 MCP_CAN CAN(SPI_CS_PIN);
 
-unsigned char msg[BODY_LENGTH] = {0, 0, 0, 0};
+uint8_t msg[BODY_LENGTH] = {0, 0, 0, 0};
 uint8_t encoded[BODY_LENGTH + 2];
 
 void setup() {
   Serial.begin(BAUD_RATE);
   Serial.println("Starting");
-  while (CAN.begin(CAN_500KBPS) != CAN_OK) {
+  while (CAN.begin(CAN_1000KBPS) != CAN_OK) {
     Serial.println("CAN BUS init failure");
     Serial.println("Trying again");
     delay(100);
@@ -46,8 +47,7 @@ void loop() {
   if (CAN_MSGAVAIL == CAN.checkReceive()) {
     CAN.readMsgBuf(&len, buf);
     unsigned long id = CAN.getCanId();
-    // for testing sending just battery voltage is fine
-    // but more will need to be added
+
     if (id == ECU1) {
       msg[3] = 0x01;   // UART MSG ID
       msg[2] = buf[2]; // Speed KM/H
@@ -60,9 +60,9 @@ void loop() {
       msg[0] = buf[0]; // FAN STATUS ACTIVE
     } else if (id == ECU2) {
       msg[3] = 0x02;   // UART MSG ID
-      msg[2] = buf[2]; // VOLTAGE / 0.1216
-      msg[1] = buf[1]; // PDM GLOBAL ERROR
-      msg[0] = buf[0]; // FAN STATUS ACTIVE
+      msg[0] = buf[0]; // fuel pressure / 10 in delta kpa
+      msg[1] = buf[2]; // LSB of steering angle
+      msg[2] = buf[3]; // MSB of steering angle
     }
     fcobs_encode(msg, encoded, BODY_LENGTH);
     writeMsg(encoded, BODY_LENGTH + 2);

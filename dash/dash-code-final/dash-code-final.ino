@@ -10,6 +10,15 @@
 #define BODY_LENGTH 4
 #define ENCODED_LENGTH BODY_LENGTH + 2
 
+struct CANData {
+  int rpm;
+  uint8_t tps;
+  float voltage;
+  int speed; // in km/h
+  bool pdmError;
+  bool fanActive;
+};
+
 IntervalTimer timer;
 
 volatile unsigned char n = 0;
@@ -17,7 +26,7 @@ volatile uint8_t currentMsg[BODY_LENGTH];
 volatile uint8_t data[ENCODED_LENGTH];
 volatile int tps;
 
-bool canStarted = false;
+volatile bool canStarted = false;
 
 void timerInterrupt() {
   recvData();  
