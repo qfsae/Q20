@@ -1,7 +1,0 @@
-{
-    "programmer": "ArduinoISP",
-    "board": "arduino:avr:nano",
-    "sketch": "sim_ECEnight\\ETC.ino",
-    "configuration": "cpu=atmega328",
-    "port": "COM8"
-}
