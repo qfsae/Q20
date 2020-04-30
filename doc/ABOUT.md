@@ -1,0 +1,1 @@
+File for all documentation on configurations, components..etc.

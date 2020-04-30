@@ -1,38 +1,30 @@
 # Queen's Formula SAE Team - Q20
 
-Codebase and configurations for QFSAE Q20 team. The team is currently using the MoTeC M150 ECU, PDM15 and L180. 
+Codebase and configurations for QFSAE Q20 team.
 
-This repository is used to maintain all of the code regarding CAN Bus protocol, the Q20 dash system, custom PCB projects and documentation for all other components of the electrical system. 
+This repository was used throughout the 2019-2020 year to maintain code, documentation and develop the Q20 Electrical and Software systems. 
 
-This repository will also be used as an archive of various versions of each system.
+This repository has been moved to a GitLab group, which can be found [here](https://code.engineering.queensu.ca/qfsae)
 
-## Folder Directory
-- CAN Bus
-- dash
-- data
-- ecu
-- harness
-- mcu
-- pdm
-- schematics
-- shifting
-- sim-data
-- testing
 
-## Dash Display
+## Projects
 
-## Harness
+### Dash Display
 
-## Simulator
+### Harness
+
+### Simulator
 The team has developed a pipeline to simulate our CAN communication protocols through the game Assetto Corsa. 
 
-A console application in C++ was developed to push data received through shared memory through Serial to an Arduino, which relays the data through a CAN Bus network. 
+## Authors
+- [Brent Champion](https://github.com/bchampp)
+- [Logan Lim](https://github.com/llim1)
+- [Ethan Peterson](https://github.com/ethanmpeterson)
+- [Ryan Anderson](https://github.com/ryan-and)
+- [Jacob O'Riordan Ross](https://github.com/JacobORiordanRoss)
+- [Angus Hodgins](https://github.com/angushodgins)
+- [Nick Totman](https://github.com/necm77)
+- [Alex Koch](https://github.com/alexkoch14)
 
-The Arduino replicates our cars CAN Bus network by transmitting all of the messages with the same ID's as the components on the car. This allows us to be able to test our software for various systems accurately through the Simulator.
-
-To build the data stream code for the simulator, ensure that gcc is compiled on the machine. Also ensure that you have navigated to the correct working directory to access the make file.
-
-``` >> make simulation 3 && ./simulation```
-
-Once the console application is running ensure that the COM Port of the Arduino matches the target of the make file.
-
+## License
+All of the projects in this repository are licensed under the MIT License - see the [LICENSE](https://github.com/Q20/blob/master/LICENSE) file for details
