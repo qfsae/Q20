@@ -1,11 +1,15 @@
 
 #include "stdafx.h"
 #include <windows.h>
+#include <string>
 #include <tchar.h>
 #include <iostream>
 #include "SharedFileOut.h"
 
 using namespace std;
+
+int PORT_NUM = 0;
+string COM_PORT = "\\\\.\\COM" + to_string(PORT_NUM);
 
 template <typename T, unsigned S>
 inline unsigned arraysize(const T(&v)[S])
@@ -124,6 +128,7 @@ inline void printData(const string name, const T(&v)[S])
 
 int _tmain(int argc, _TCHAR* argv[])
 {
+
 	initPhysics();
 	initGraphics();
 	initStatic();
