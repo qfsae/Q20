@@ -1,5 +1,4 @@
 # Q20
-=======
 # Queen's Formula SAE Team - Q20
 
 This repository was used throughout the 2019-2020 year to maintain code, documentation and develop the Q20 Electrical and Software systems. 
