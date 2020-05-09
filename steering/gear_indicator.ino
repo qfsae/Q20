@@ -1,0 +1,1 @@
+// File for gear indicator class
