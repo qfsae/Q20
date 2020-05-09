@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Q20
 =======
 # Queen's Formula SAE Team - Q20
@@ -55,4 +54,3 @@ program and the CAN enabled Arduino are given below.
 
 ## License
 All of the projects in this repository are licensed under the MIT License - see the [LICENSE](https://github.com/Q20/blob/master/LICENSE) file for details
->>>>>>> oldrepo/master
